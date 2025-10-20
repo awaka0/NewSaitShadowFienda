@@ -24,6 +24,21 @@
         </div>
     </header>
 
+    <a href="prac13.html">Первая страница</a>
+    <a href="prac13(2).html">Вторая страница</a>
+    <button class="backButton">Назад</button>
+    <button class="forwardButton">Вперед</button>
+
+    <button id="add">Добавить элемент</button>
+  <button id="remove">Удалить элемент</button>
+  <button id="clone">Клонировать элемент</button>
+
+  <div id="container"></div>
+  <h1 class="mb-4">Список статей</h1>
+    <button id="addArticleBtn" class="btn btn-primary mb-4">Добавить статью</button>
+    <div id="articlesList" class="row gy-3"></div>
+  </div>
+
     <main>
         <div class="container">
             <div class="hero-info">
@@ -59,12 +74,151 @@
                     </div>
     </main>
 
+    <script>
+        const backButton = document.querySelector('.backButton');
+const forwardButton = document.querySelector('.forwardButton');
+
+backButton.addEventListener('click', () => {
+    window.history.back();
+});
+
+forwardButton.addEventListener('click', () => {
+    window.history.forward();
+});
+const container = document.getElementById('container');
+    const addBtn = document.getElementById('add');
+    const removeBtn = document.getElementById('remove');
+    const cloneBtn = document.getElementById('clone');
+
+    let count = 0;
+
+    addBtn.onclick = () => {
+      count++;
+      const box = document.createElement('div');
+      box.className = 'box';
+      box.textContent = count;
+      container.appendChild(box);
+    };
+
+    removeBtn.onclick = () => {
+      if (container.lastElementChild) {
+        container.removeChild(container.lastElementChild);
+      }
+    };
+
+    cloneBtn.onclick = () => {
+      const last = container.lastElementChild;
+      if (last) {
+        const clone = last.cloneNode(true);
+        container.appendChild(clone);
+      }
+    };
+    const STORAGE_KEY = 'articlesData';
+
+    const initialArticles = [
+      { title: "Первая статья", text: "Это текст первой статьи." },
+      { title: "Вторая статья", text: "Текст второй статьи здесь." }
+    ];
+
+    const articlesList = document.getElementById('articlesList');
+    const addArticleBtn = document.getElementById('addArticleBtn');
+
+    function loadArticles() {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return stored ? JSON.parse(stored) : initialArticles;
+    }
+
+    function saveArticles(articles) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(articles));
+    }
+
+    function renderArticles() {
+      const articles = loadArticles();
+      articlesList.innerHTML = '';
+
+      articles.forEach((article, index) => {
+        const col = document.createElement('div');
+        col.className = 'col-12';
+
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const cardBody = document.createElement('div');
+        cardBody.className = 'card-body';
+
+        const h2 = document.createElement('h2');
+        h2.className = 'card-title h5'; 
+        h2.textContent = article.title;
+
+        const p = document.createElement('p');
+        p.className = 'card-text';
+        p.textContent = article.text;
+
+        const btnGroup = document.createElement('div');
+        btnGroup.className = 'btn-group';
+
+        const editBtn = document.createElement('button');
+        editBtn.className = 'btn btn-warning btn-sm';
+        editBtn.textContent = 'Редактировать';
+        editBtn.onclick = () => editArticle(index);
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn btn-danger btn-sm';
+        deleteBtn.textContent = 'Удалить';
+        deleteBtn.onclick = () => deleteArticle(index);
+
+        btnGroup.append(editBtn, deleteBtn);
+
+        cardBody.append(h2, p, btnGroup);
+        card.appendChild(cardBody);
+        col.appendChild(card);
+        articlesList.appendChild(col);
+      });
+    }
+
+    function addArticle() {
+      const articles = loadArticles();
+      articles.push({
+        title: 'Новая статья',
+        text: 'Введите содержание статьи...'
+      });
+      saveArticles(articles);
+      renderArticles();
+    }
+
+    function deleteArticle(index) {
+      const articles = loadArticles();
+      articles.splice(index, 1);
+      saveArticles(articles);
+      renderArticles();
+    }
+
+    function editArticle(index) {
+      const articles = loadArticles();
+      const current = articles[index];
+
+      const newTitle = prompt('Введите новый заголовок статьи:', current.title);
+      if (newTitle === null) return; 
+
+      const newText = prompt('Введите новый текст статьи:', current.text);
+      if (newText === null) return; 
+
+      articles[index] = {
+        title: newTitle.trim() || current.title,
+        text: newText.trim() || current.text
+      };
+      saveArticles(articles);
+      renderArticles();
+    }
+
+    addArticleBtn.addEventListener('click', addArticle);
+
+    renderArticles();
+    </script>
+
     <footer>
             <p>&copy; 2025 Dota 2</p>
     </footer>
 
 </body>
 </html>
-
-
-
